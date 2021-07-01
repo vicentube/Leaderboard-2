@@ -8,20 +8,19 @@ import Foundation
 import Combine
 
 final class PlayerListViewModel: ObservableObject {
-  private let model = PlayerStore.shared
+  private let model: LeaderboardModel = .shared
   private var cancellable: AnyCancellable?
-  
-  @Published var showingNewPlayer = false
   
   var players: [Player] {
     model.players
   }
   
   init() {
-    cancellable = model.objectWillChange.sink { [weak self] in
+    // subscribe to model changes to notify the view
+    self.cancellable = model.objectWillChange.sink { [weak self] in
       self?.objectWillChange.send()
     }
-    model.getAllPlayers()
+    self.model.getAllPlayers()
   }
   
   func movePlayers(indices: IndexSet, newOffset: Int) {
@@ -34,9 +33,5 @@ final class PlayerListViewModel: ObservableObject {
   
   func sortLeaderboard() {
     model.sort()
-  }
-  
-  func showNewPlayerView() {
-    showingNewPlayer = true
   }
 }

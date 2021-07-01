@@ -1,4 +1,4 @@
-// PlayerStore.swift
+// LeaderboardModel.swift
 // Leaderboard-2
 //
 // Creado el 30/6/21 por Vicente Úbeda (@vicentube)
@@ -7,15 +7,20 @@
 import Foundation
 import Combine
 
-final class PlayerStore: ObservableObject {
-  static var shared = PlayerStore()
+final class LeaderboardModel: ObservableObject {
+  // shared instance
+  static var shared = LeaderboardModel()
   
   @Published var players: [Player] = []
   
   private let services: Services
   
-  init(services: Services = .app) {
+  init(services: Services = Services()) {
     self.services = services
+  }
+  
+  func index(of player: Player) -> Int? {
+    players.firstIndex(where: { $0.id == player.id })
   }
   
   func move(indices: IndexSet, newOffset: Int) {
@@ -57,11 +62,5 @@ final class PlayerStore: ObservableObject {
         self?.players.append(player)
       }
     }
-  }
-}
-
-extension PlayerStore {
-  static func preview() {
-    PlayerStore.shared = PlayerStore(services: .preview)
   }
 }

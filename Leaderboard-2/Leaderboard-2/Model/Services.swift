@@ -5,15 +5,10 @@
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
 struct Services {
+  
   let database: DatabaseServiceProtocol
   
-  init(database: DatabaseServiceProtocol) {
+  init(database: DatabaseServiceProtocol = CoreDataService()) {
     self.database = database
-  }
-}
-
-extension Services {
-  static var app: Services {
-    Services(database: CoreDataService())
   }
 }

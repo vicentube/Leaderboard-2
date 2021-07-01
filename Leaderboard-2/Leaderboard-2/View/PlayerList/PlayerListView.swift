@@ -7,18 +7,16 @@
 import SwiftUI
 
 struct PlayerListView: View {
-  @StateObject private var viewModel: PlayerListViewModel
   
-  init(services: Services = .app) {
-    self._viewModel = StateObject(wrappedValue: PlayerListViewModel())
-  }
+  @StateObject private var viewModel = PlayerListViewModel()
+  @State private var showingNewPlayer = false
   
   var body: some View {
     NavigationView {
       ZStack {
         List {
           ForEach(viewModel.players) { player in
-            NavigationLink(destination: PlayerDetailView(player: player, onPlayerChanged: viewModel.savePlayer)) {
+            NavigationLink(destination: PlayerDetailView(player: player)) {
               PlayerRow(player: player)
             }
           }
@@ -36,8 +34,8 @@ struct PlayerListView: View {
             EditButton()
           }
         }
-        .sheet(isPresented: $viewModel.showingNewPlayer) {
-          PlayerEditView(player: Player(), onPlayerChanged: viewModel.savePlayer)
+        .sheet(isPresented: $showingNewPlayer) {
+          PlayerEditView(player: Player())
         }
         newPlayerButton
       }
@@ -49,7 +47,7 @@ struct PlayerListView: View {
       Spacer()
       HStack {
         Spacer()
-        Button(action: viewModel.showNewPlayerView) {
+        Button(action: { showingNewPlayer = true }) {
           Image(systemName: "plus.circle.fill")
             .font(.system(size: 60))
             .padding()
@@ -61,6 +59,7 @@ struct PlayerListView: View {
 
 struct PlayerListView_Previews: PreviewProvider {
   static var previews: some View {
-    PlayerListView(services: .preview)
+    _ = LeaderboardModel.preview
+    return PlayerListView()
   }
 }

@@ -7,20 +7,19 @@
 import SwiftUI
 
 struct PlayerDetailView: View {
-  @StateObject private var viewModel: PlayerDetailViewModel
   
-  init(player: Player,
-       onPlayerChanged: @escaping (Player) -> Void = { _ in }) {
-    self._viewModel = StateObject(wrappedValue: PlayerDetailViewModel(player: player, onPlayerChanged: onPlayerChanged))
-  }
+  let player: Player
+  
+  @State private var showingChangeScore = false
+  @State private var showingPlayerEdit = false
   
   var body: some View {
     VStack(spacing: 20) {
       picture
-      Text("Score: \(viewModel.player.score)")
+      Text("Score: \(player.score)")
         .font(.largeTitle)
       Spacer()
-      Button(action: viewModel.showChangeScoreView) {
+      Button(action: { showingChangeScore = true }) {
         Text("Change score")
           .font(.title)
           .padding()
@@ -30,27 +29,27 @@ struct PlayerDetailView: View {
       }
     }
     .padding()
-    .navigationBarTitle(viewModel.player.name)
+    .navigationBarTitle(player.name)
     .toolbar { toolbar }
-    .sheet(isPresented: $viewModel.showingPlayerEdit) {
-      PlayerEditView(player: viewModel.player, onPlayerChanged: viewModel.notifyPlayerChanged)
+    .sheet(isPresented: $showingPlayerEdit) {
+      PlayerEditView(player: player)
     }
-    .sheet(isPresented: $viewModel.showingChangeScore) {
-      PlayerChangeScoreView(player: viewModel.player, onPlayerChanged: viewModel.notifyPlayerChanged)
-      Text("\(viewModel.player.name)")
+    .sheet(isPresented: $showingChangeScore) {
+      PlayerChangeScoreView(player: player)
+      Text("\(player.name)")
     }
   }
   
   var toolbar: some ToolbarContent {
     ToolbarItem(placement: .navigationBarTrailing) {
-      Button(action: viewModel.showPlayerEditView) {
+      Button(action: { showingPlayerEdit = true }) {
         Image(systemName: "pencil")
       }
     }
   }
   
   var picture: some View {
-    Image(uiImage: viewModel.player.pictureImage ?? UIImage(named: "Placeholder")!)
+    Image(uiImage: player.pictureImage ?? UIImage(named: "Placeholder")!)
       .resizable()
       .scaledToFit()
       .frame(height: 250)
@@ -60,6 +59,7 @@ struct PlayerDetailView: View {
 
 struct PlayerDetailView_Previews: PreviewProvider {
   static var previews: some View {
-    PlayerDetailView(player: Player.preview)
+    let model = LeaderboardModel.preview
+    return PlayerDetailView(player: model.players[0])
   }
 }

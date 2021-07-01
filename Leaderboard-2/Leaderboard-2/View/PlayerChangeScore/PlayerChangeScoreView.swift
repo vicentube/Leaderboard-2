@@ -7,12 +7,12 @@
 import SwiftUI
 
 struct PlayerChangeScoreView: View {
+  
   @Environment(\.presentationMode) var presentationMode
   @StateObject private var viewModel: PlayerChangeScoreViewModel
   
-  init(player: Player,
-       onPlayerChanged: @escaping (Player) -> Void = { _ in }) {
-    self._viewModel = StateObject(wrappedValue: PlayerChangeScoreViewModel(player: player, onPlayerChanged: onPlayerChanged))
+  init(player: Player) {
+    self._viewModel = StateObject(wrappedValue: PlayerChangeScoreViewModel(player: player))
   }
   
   var body: some View {
@@ -32,15 +32,18 @@ struct PlayerChangeScoreView: View {
       .font(.title)
       Spacer()
     }
+    .onAppear {
+      viewModel.closeView = { presentationMode.wrappedValue.dismiss() }
+    }
   }
   
   var toolbar: some View {
     HStack {
-      Button(action: { presentationMode.wrappedValue.dismiss() }) {
+      Button(action: viewModel.closeView) {
         Text("Cancel")
       }
       Spacer()
-      Button(action: viewModel.onDoneTap) {
+      Button(action: viewModel.saveAndClose) {
         Text("Done")
           .fontWeight(.bold)
       }
@@ -54,10 +57,12 @@ struct PlayerChangeScoreView: View {
       .scaledToFit()
       .frame(height: 100)
   }
+  
 }
 
 struct PlayerChangeScoreView_Previews: PreviewProvider {
     static var previews: some View {
-      PlayerChangeScoreView(player: Player.preview)
+      let model = LeaderboardModel.preview
+      return PlayerChangeScoreView(player: model.players[0])
     }
 }

@@ -4,31 +4,35 @@
 // Creado el 30/6/21 por Vicente Úbeda (@vicentube)
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
-import SwiftUI
+import Combine
+import UIKit.UIImage
 
 final class PlayerEditViewModel: ObservableObject {
+  private let model: LeaderboardModel = .shared
+  private var cancellable: AnyCancellable?
   
   @Published var player: Player
-  var playerChanged: ((Player) -> Void)
-  
   @Published var pickedImage: UIImage? = nil
   @Published var playerPicture: UIImage? = nil
-  @Published var showingImagePicker = false
   
-  init(player: Player, onPlayerChanged: @escaping (Player) -> Void) {
+  var closeView: (() -> Void)!
+  
+  init(player: Player) {
     self.player = player
-    self.playerChanged = onPlayerChanged
+    // subscribe to model changes to notify the view
+    self.cancellable = model.objectWillChange.sink { [weak self] in
+      self?.objectWillChange.send()
+    }
   }
   
-  func showImagePicker() {
-    showingImagePicker = true
-  }
-  
-  func onDoneTap() {
+  func saveAndClose() {
+    // update player if picture has changed
     if let playerPicture = playerPicture {
       player.savePicture(playerPicture)
     }
-    playerChanged(player)
+    // persist player and close the view
+    model.savePlayer(player)
+    closeView()
   }
   
   func onDismissImagePicker() {

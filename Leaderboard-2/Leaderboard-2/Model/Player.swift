@@ -8,6 +8,7 @@ import Foundation
 import UIKit.UIImage
 
 struct Player: Identifiable {
+  
   var id: UUID = UUID()
   var name = ""
   var score = 0

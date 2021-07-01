@@ -7,14 +7,15 @@
 import SwiftUI
 
 struct PlayerEditView: View {
+  
   @Environment(\.presentationMode) var presentationMode
   @StateObject private var viewModel: PlayerEditViewModel
+  @State private var showingImagePicker = false
   
   let thumbnailSize = CGSize(width: 50, height: 50)
   
-  init(player: Player,
-       onPlayerChanged: @escaping (Player) -> Void = { _ in }) {
-    self._viewModel = StateObject(wrappedValue: PlayerEditViewModel(player: player, onPlayerChanged: onPlayerChanged))
+  init(player: Player) {
+    self._viewModel = StateObject(wrappedValue: PlayerEditViewModel(player: player))
   }
   
   var body: some View {
@@ -27,15 +28,18 @@ struct PlayerEditView: View {
         }
       }
     }
+    .onAppear {
+      viewModel.closeView = { presentationMode.wrappedValue.dismiss() }
+    }
   }
   
   var toolbar: some View {
     HStack {
-      Button(action: { presentationMode.wrappedValue.dismiss() }) {
+      Button(action: viewModel.closeView) {
         Text("Cancel")
       }
       Spacer()
-      Button(action: viewModel.onDoneTap) {
+      Button(action: viewModel.saveAndClose) {
         Text("Done")
           .fontWeight(.bold)
       }
@@ -59,16 +63,17 @@ struct PlayerEditView: View {
         .frame(width: thumbnailSize.width, height: thumbnailSize.height)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
-    .onTapGesture(perform: viewModel.showImagePicker)
-    .sheet(isPresented: $viewModel.showingImagePicker, onDismiss: viewModel.onDismissImagePicker) {
+    .onTapGesture { showingImagePicker = true }
+    .sheet(isPresented: $showingImagePicker, onDismiss: viewModel.onDismissImagePicker) {
       ImagePicker(image: $viewModel.pickedImage)
     }
   }
-  
+
 }
 
 struct PlayerEditView_Previews: PreviewProvider {
   static var previews: some View {
-    PlayerEditView(player: Player.preview)
+    let model = LeaderboardModel.preview
+    return PlayerEditView(player: model.players[0])
   }
 }

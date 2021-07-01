@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct PlayerRow: View {
+  
   let player: Player
   
   var body: some View {
@@ -29,6 +30,7 @@ struct PlayerRow: View {
 
 struct PlayerRow_Previews: PreviewProvider {
   static var previews: some View {
-    PlayerRow(player: Player.preview)
+    let model = LeaderboardModel.preview
+    return PlayerRow(player: model.players[0])
   }
 }

@@ -6,8 +6,4 @@
 
 import Foundation
 
-extension Player {
-  static var preview: Player {
-    Player(id: UUID(), name: "Preview player", score: 30, pictureId: nil)
-  }
-}
+
